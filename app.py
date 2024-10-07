@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, render_template, request
 import requests
 import os
 
@@ -24,29 +24,34 @@ def get_actor_movies(actor_id):
         return {movie['id']: movie['title'] for movie in response.json().get('cast', [])}
     return {}
 
-# Rota para buscar filmes em comum entre dois atores
-@app.route('/comum', methods=['GET'])
+# Rota para a página principal
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+# Rota para buscar filmes em comum
+@app.route('/filmes_comuns', methods=['POST'])
 def filmes_comuns():
-    ator1 = request.args.get('ator1')
-    ator2 = request.args.get('ator2')
+    ator1 = request.form['ator1']
+    ator2 = request.form['ator2']
     
     if not ator1 or not ator2:
-        return jsonify({"error": "Você precisa fornecer dois atores"}), 400
+        return render_template('index.html', error="Você precisa fornecer dois atores.")
     
     ator1_id = get_actor_id(ator1)
     ator2_id = get_actor_id(ator2)
     
     if not ator1_id or not ator2_id:
-        return jsonify({"error": "Não foi possível encontrar um ou ambos os atores"}), 404
+        return render_template('index.html', error="Não foi possível encontrar um ou ambos os atores.")
     
     ator1_filmes = get_actor_movies(ator1_id)
     ator2_filmes = get_actor_movies(ator2_id)
     
     filmes_comuns = set(ator1_filmes.keys()) & set(ator2_filmes.keys())
     
-    resultado = {filme_id: ator1_filmes[filme_id] for filme_id in filmes_comuns}
+    resultado = [ator1_filmes[filme_id] for filme_id in filmes_comuns]
     
-    return jsonify(resultado)
+    return render_template('index.html', filmes=resultado)
 
 if __name__ == "__main__":
     app.run()
