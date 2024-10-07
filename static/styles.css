@@ -1,0 +1,17 @@
+.sugestoes {
+    border: 1px solid #ccc;
+    background-color: white;
+    position: absolute;
+    z-index: 1000;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.sugestoes div {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.sugestoes div:hover {
+    background-color: #f0f0f0;
+}

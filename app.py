@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 import requests
 import os
 
@@ -53,5 +53,20 @@ def filmes_comuns():
     
     return render_template('index.html', filmes=resultado)
 
+# Rota para buscar sugestões de atores
+@app.route('/buscar_atores', methods=['GET'])
+def buscar_atores():
+    nome_ator = request.args.get('query')
+    api_key = os.getenv('TMDB_API_KEY')
+    
+    # Chama a API da TMDB
+    url = f"https://api.themoviedb.org/3/search/person?api_key={api_key}&query={nome_ator}"
+    response = requests.get(url)
+    
+    if response.status_code == 200:
+        return jsonify(response.json())
+    else:
+        return jsonify({'results': []}), 404
+
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
