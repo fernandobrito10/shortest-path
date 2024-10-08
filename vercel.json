@@ -1,5 +1,10 @@
 {
     "version": 2,
+    "functions": {
+      "app.py": {
+        "maxDuration": 60
+      }
+    },
     "builds": [
       {
         "src": "app.py",
@@ -11,11 +16,7 @@
         "src": "/(.*)",
         "dest": "app.py"
       }
-    ],
-    "functions": {
-      "/app.py": {
-        "maxDuration": 30
-      }
-    }
+    ]
+    
   }
   
