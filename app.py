@@ -58,14 +58,14 @@ def find_actor_route(actor1_id, actor2_id, max_depth=7):
 
     while queue:
         current_actor_id, path, depth = queue.popleft()
-
+        
         # Se a profundidade máxima for alcançada, continue
         if depth >= max_depth:
             continue
-
+        
         if current_actor_id in visited:
             continue
-
+        
         visited.add(current_actor_id)
         current_movies = get_actor_movies(current_actor_id)
 
@@ -86,16 +86,12 @@ def find_actor_route(actor1_id, actor2_id, max_depth=7):
                 cast = response.json().get('cast', [])
                 for actor in cast:
                     if actor['id'] == actor2_id:
-                        # Adiciona as imagens dos atores e filmes ao caminho
-                        actor_image_url = f"https://image.tmdb.org/t/p/w500{actor['profile_path']}" if actor.get('profile_path') else None
-                        movie_image_url = f"https://image.tmdb.org/t/p/w500{movie['poster_path']}" if movie.get('poster_path') else None
-                        return new_path + [(actor2_id, get_actor_name(actor2_id), actor_image_url, movie_image_url)]
-
+                        return new_path + [(actor2_id, get_actor_name(actor2_id))]
                     if actor['id'] not in visited:
+                        # Adiciona o novo ator à fila com a profundidade aumentada
                         queue.append((actor['id'], new_path, depth + 1))
 
     return None  # Se não encontrar uma rota
-
 
 # Rota para a página principal
 @app.route('/')
