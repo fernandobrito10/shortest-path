@@ -24,6 +24,18 @@ def get_actor_movies(actor_id):
         return {movie['id']: movie['title'] for movie in response.json().get('cast', [])}
     return {}
 
+# Rota para buscar atores enquanto o usuário digita
+@app.route('/buscar_atores')
+def buscar_atores():
+    query = request.args.get('query', '')
+    if query:
+        api_key = os.getenv('TMDB_API_KEY')
+        url = f"https://api.themoviedb.org/3/search/person?api_key={api_key}&query={query}"
+        response = requests.get(url)
+        if response.status_code == 200:
+            return jsonify(response.json())
+    return jsonify({'results': []})
+
 # Rota para a página principal
 @app.route('/')
 def index():
@@ -32,8 +44,8 @@ def index():
 # Rota para buscar filmes em comum
 @app.route('/filmes_comuns', methods=['POST'])
 def filmes_comuns():
-    ator1 = request.form['ator1']
-    ator2 = request.form['ator2']
+    ator1 = request.form.get('ator1')
+    ator2 = request.form.get('ator2')
     
     if not ator1 or not ator2:
         return render_template('index.html', error="Você precisa fornecer dois atores.")
@@ -51,22 +63,9 @@ def filmes_comuns():
     
     resultado = [ator1_filmes[filme_id] for filme_id in filmes_comuns]
     
-    return render_template('index.html', filmes=resultado)
+    # Aqui estamos passando 'ator1' e 'ator2' para o template
+    return render_template('index.html', filmes=resultado, ator1=ator1, ator2=ator2)
 
-# Rota para buscar sugestões de atores
-@app.route('/buscar_atores', methods=['GET'])
-def buscar_atores():
-    nome_ator = request.args.get('query')
-    api_key = os.getenv('TMDB_API_KEY')
-    
-    # Chama a API da TMDB
-    url = f"https://api.themoviedb.org/3/search/person?api_key={api_key}&query={nome_ator}"
-    response = requests.get(url)
-    
-    if response.status_code == 200:
-        return jsonify(response.json())
-    else:
-        return jsonify({'results': []}), 404
 
 if __name__ == "__main__":
     app.run(debug=True)
